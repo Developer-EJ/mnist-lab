@@ -23,17 +23,24 @@ class Affine:
         """가중치 W와 편향 b를 외부 params dict와 같은 배열 객체로 공유합니다."""
         self.W = W
         self.b = b
+        self.x = None
+        self.dW = None
+        self.db = None
 
     def forward(self, x):
         """
         Args:
-            x: (batch_size, input_dim)
+            x: (batch_size, input_dim)v
 
         Returns:
             (batch_size, output_dim)
         """
         # TODO: backward에서 사용할 입력 x를 저장하고 x @ W + b를 반환하세요.
-        raise NotImplementedError("Affine.forward를 구현하세요.")
+        
+        self.x = x
+        out = np.dot(x, self.W) + self.b
+
+        return out
 
     def backward(self, dout):
         """
@@ -48,8 +55,11 @@ class Affine:
         """
         # TODO: self.dW, self.db, dx를 계산하세요.
         # 힌트: dW = x.T @ dout, db = batch 방향 합, dx = dout @ W.T
-        raise NotImplementedError("Affine.backward를 구현하세요.")
-
+        dx = np.dot(dout, self.W.T)
+        self.dW = np.dot(self.x.T, dout)
+        self.db = np.sum(dout, axis = 0)
+        
+        return dx
 
 class BatchNorm:
     """
@@ -105,8 +115,7 @@ class Dropout:
     """
     Dropout.
 
-    학습 중 일부 뉴런 출력을 무작위로 0으로 만들어 과적합을 줄입니다.
-    이 구현은 추론 시 출력에 (1 - drop_ratio)를 곱하는 기본 dropout 방식을 사용합니다.
+    학습 중 일부 뉴런 출력을 무작위로 0으로 만들어 과적합을 줄입니다.             
     """
 
     def __init__(self, drop_ratio=0.5):
