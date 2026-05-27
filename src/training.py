@@ -7,16 +7,7 @@ import numpy as np
 from losses import cross_entropy_loss
 
 
-def train(
-    model,
-    optimizer,
-    x_train,
-    y_train,
-    epochs=20,
-    batch_size=128,
-    x_test=None,
-    y_test=None,
-):
+def train(model, optimizer, x_train, y_train, epochs=20, batch_size=128):
     """
     미니배치 학습 루프.
 
@@ -30,8 +21,6 @@ def train(
     # TODO: epoch마다 데이터를 섞고, batch 단위로 forward/loss/backward/update를 수행하세요.
     # 힌트: Softmax + CrossEntropy 결합 gradient는 y_pred copy에서 정답 위치에 1을 빼서 만듭니다.
     loss_history = []
-    test_loss_history = []
-    track_test_loss = x_test is not None and y_test is not None
     n = x_train.shape[0]
 
     for epoch in range(epochs):
@@ -66,21 +55,8 @@ def train(
             optimizer.update(model.params, model.grads)
 
         loss_history.append(epoch_loss / n_batches)
+        print(f"Epoch {epoch + 1}/{epochs}  loss: {loss_history[-1]:.4f}")
 
-        if track_test_loss:
-            y_test_pred = model.predict(x_test)
-            test_loss = cross_entropy_loss(y_test_pred, y_test)
-            test_loss_history.append(test_loss)
-            print(
-                f"Epoch {epoch + 1}/{epochs}  "
-                f"loss: {loss_history[-1]:.4f}  "
-                f"test_loss: {test_loss:.4f}"
-            )
-        else:
-            print(f"Epoch {epoch + 1}/{epochs}  loss: {loss_history[-1]:.4f}")
-
-    if track_test_loss:
-        return loss_history, test_loss_history
     return loss_history
 
 

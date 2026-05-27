@@ -30,7 +30,7 @@ class Affine:
     def forward(self, x):
         """
         Args:
-            x: (batch_size, input_dim)
+            x: (batch_size, input_dim)v
 
         Returns:
             (batch_size, output_dim)
@@ -40,7 +40,6 @@ class Affine:
         out = np.dot(x, self.W) + self.b
 
         return out
-        raise NotImplementedError("Affine.forward를 구현하세요.")
 
     def backward(self, dout):
         """
@@ -60,8 +59,6 @@ class Affine:
         self.db = np.sum(dout, axis=0)
 
         return dx
-        raise NotImplementedError("Affine.backward를 구현하세요.")
-
 
 class BatchNorm:
     """
@@ -97,17 +94,14 @@ class BatchNorm:
         # TODO: train=True에서는 batch mean/var로 정규화하고 running 통계를 갱신하세요.
         # TODO: train=False에서는 running_mean/running_var를 사용하세요.
         if train:
-            self.x = x
-            self.mean = np.mean(x, axis=0)
-            self.var = np.var(x, axis=0)
-            self.std = np.sqrt(self.var + self.eps)
-            self.x_centered = x - self.mean
-            self.x_norm = self.x_centered / self.std
+            mean = np.mean(x, axis=0)
+            var = np.var(x, axis=0)
+            self.x_norm = (x - mean) / np.sqrt(var + self.eps)
             self.running_mean = (
-                self.momentum * self.running_mean + (1 - self.momentum) * self.mean
+                self.momentum * self.running_mean + (1 - self.momentum) * mean
             )
             self.running_var = (
-                self.momentum * self.running_var + (1 - self.momentum) * self.var
+                self.momentum * self.running_var + (1 - self.momentum) * var
             )
         else:
             self.x_norm = (x - self.running_mean) / np.sqrt(self.running_var + self.eps)
@@ -126,25 +120,9 @@ class BatchNorm:
         """
         # TODO: self.dbeta, self.dgamma, dx를 계산하세요.
         # 힌트: 먼저 dbeta와 dgamma shape가 beta/gamma와 같은지 확인합니다.
-        batch_size = dout.shape[0]
-
         self.dbeta = np.sum(dout, axis=0)
         self.dgamma = np.sum(dout * self.x_norm, axis=0)
-
-        dx_norm = dout * self.gamma
-        dvar = np.sum(
-            dx_norm * self.x_centered * -0.5 * (self.var + self.eps) ** -1.5,
-            axis=0,
-        )
-        dmean = (
-            np.sum(dx_norm * -1 / self.std, axis=0)
-            + dvar * np.mean(-2 * self.x_centered, axis=0)
-        )
-        dx = (
-            dx_norm / self.std
-            + dvar * 2 * self.x_centered / batch_size
-            + dmean / batch_size
-        )
+        dx = dout * self.gamma / np.sqrt(np.var(self.x_norm, axis=0) + self.eps)
         return dx
 
 

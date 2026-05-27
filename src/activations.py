@@ -33,9 +33,6 @@ class ReLU:
 
         return out
 
-        # TODO: x > 0 위치를 self.mask에 저장하고, 음수/0 위치는 0으로 바꾸세요.
-        raise NotImplementedError("ReLU.forward를 구현하세요.")
-
     def backward(self, dout):
         """
         Args:
@@ -49,7 +46,6 @@ class ReLU:
         dx = dout
 
         return dx
-        raise NotImplementedError("ReLU.backward를 구현하세요.")
 
 
 class Softmax:
@@ -74,7 +70,6 @@ class Softmax:
         exp_x = np.exp(x_prevent_overflow)
         self.out = exp_x / np.sum(exp_x, axis=1, keepdims=True)
         return self.out
-        raise NotImplementedError("Softmax.forward를 구현하세요.")
 
     def backward(self, dout):
         """
@@ -83,4 +78,3 @@ class Softmax:
         """
         # TODO: train()에서 만든 gradient를 그대로 반환하세요.
         return dout
-        raise NotImplementedError("Softmax.backward를 구현하세요.")
