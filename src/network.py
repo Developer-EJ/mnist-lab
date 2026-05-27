@@ -22,7 +22,7 @@ class NeuralNetwork:
     가중치 초기화: He 또는 Xavier 중 선택.
     """
 
-    def __init__(self, use_batchnorm=True, use_dropout=True, dropout_ratio=0.2):
+    def __init__(self, use_batchnorm=True, use_dropout=True, dropout_ratio=0.5):
         """
         Args:
             use_batchnorm: 은닉층마다 BatchNorm을 넣을지 여부
